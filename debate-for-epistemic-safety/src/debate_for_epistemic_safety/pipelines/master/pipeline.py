@@ -1,5 +1,5 @@
 from kedro.pipeline import Pipeline, node
-from .nodes import filter_raw_quality_data, get_direct_answers, get_answers_with_biases
+from .nodes import filter_raw_quality_data, partition_data
 
 
 def create_pipeline(**kwargs):
@@ -12,16 +12,10 @@ def create_pipeline(**kwargs):
                 name="filter_raw_quality_data_train"
             ),
             node(
-                func=get_direct_answers,
+                func=partition_data,
                 inputs="quality_filtered_train",
-                outputs="quality_filtered_train_with_direct_answers",
-                name="get_direct_answers_train"
-            ),
-            node(
-                func=get_answers_with_biases,
-                inputs="quality_filtered_train",
-                outputs="quality_filtered_train_answers_with_biases",
-                name="get_answers_with_biases_train"
+                outputs="partitioned_quality_filtered_train",
+                name="partition_data_train"
             )
         ]
     )
