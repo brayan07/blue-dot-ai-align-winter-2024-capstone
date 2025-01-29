@@ -1,8 +1,6 @@
 from debate_for_epistemic_safety.pipelines.debate.unstructured_debate import JudgeAgent
 from debate_for_epistemic_safety.pipelines.master.evaluator import LLMConfig
 
-
-import asyncio
 import json
 from typing import Sequence, Optional, Literal, Dict
 
@@ -152,30 +150,15 @@ class StructuredDebateAgent(BaseChatAgent):
                  max_rounds: int = 3):
         super().__init__(name=name, description="A Debate Agent")
         self._model_client = model_client
-        self._system_messages = [
-            SystemMessage(
-                content=system_message
-            ),
-        ]
+
         self._article_title = article_title
         self._article_text = article_text
         self._question_text = question_text
         self._options = options
         self._option_to_defend_index = option_to_defend_index
-        self._history = []
-        self._last_response: Optional[ResponseModelWithLogProb] = None
+        self._chat_history = []
         self.round = 0
-        self._max_rounds = max_rounds
-
-    @property
-    def logger(self) -> logging.Logger:
-        return logging.getLogger(__name__)
-
-    async def on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Response:
-        self.round += 1
-        for message in messages:
-            self._history.append(UserMessage(content=message.content, source=message.source))
-        article_information = (
+        self._article_information = (
             "------- This message can only be seen by you -------\n"
             "Here is the article you will be discussing:\n"
             f"Article Title: {self._article_title}\n"
@@ -189,7 +172,25 @@ class StructuredDebateAgent(BaseChatAgent):
             f"B. {self._options[1]}\n"
             "----------------------------------------------------"
         )
-        article_information_message = UserMessage(content=article_information, source="moderator")
+        self._system_messages = [
+            SystemMessage(
+                content=system_message
+            ),
+            UserMessage(
+                content=self._article_information,
+                source="moderator"
+            )
+        ]
+        self._max_rounds = max_rounds
+
+    @property
+    def logger(self) -> logging.Logger:
+        return logging.getLogger(__name__)
+
+    async def on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Response:
+        self.round += 1
+        for message in messages:
+            self._chat_history.append(UserMessage(content=message.content, source=message.source))
         if self.round == 1:
             round_n_message = (
                 "------- This message can only be seen by you -------\n"
@@ -199,8 +200,7 @@ class StructuredDebateAgent(BaseChatAgent):
                 "\nWhen presenting facts, state the facts plainly without interpretation or opinion. Reserve interpretation for the premises and the conclusion."
                 "----------------------------------------------------"
             )
-            llm_messages = self._system_messages + [article_information_message] + self._history + [
-                UserMessage(content=round_n_message, source="moderator")]
+            llm_messages = self._system_messages + self._chat_history + [UserMessage(content=round_n_message, source="moderator")]
             result = await self._model_client.create(
                 messages=llm_messages,
                 cancellation_token=cancellation_token,
@@ -208,7 +208,7 @@ class StructuredDebateAgent(BaseChatAgent):
             )
             parsed_response = StructuredArgument(**json.loads(result.content))
             argument_text = convert_structured_argument_to_text(parsed_response)
-            self._history.append(
+            self._chat_history.append(
                 AssistantMessage(
                     content=argument_text,
                     source=self.name
@@ -223,8 +223,7 @@ class StructuredDebateAgent(BaseChatAgent):
                 f"It is round 2 (out of {self._max_rounds}) of the debate. The other agent has presented their argument. Now, rebut the other agent's argument."
                 "----------------------------------------------------"
             )
-            llm_messages = self._system_messages + [article_information_message] + self._history + [
-                UserMessage(content=round_n_message, source="moderator")]
+            llm_messages = self._system_messages + self._chat_history + [UserMessage(content=round_n_message, source="moderator")]
             result = await self._model_client.create(
                 messages=llm_messages,
                 cancellation_token=cancellation_token,
@@ -232,7 +231,7 @@ class StructuredDebateAgent(BaseChatAgent):
             )
             parsed_response = StructuredRebuttal(**json.loads(result.content))
             rebuttal_text = convert_structured_rebuttal_to_text(parsed_response)
-            self._history.append(
+            self._chat_history.append(
                 AssistantMessage(
                     content=rebuttal_text,
                     source=self.name
@@ -249,7 +248,7 @@ class StructuredDebateAgent(BaseChatAgent):
                 "\nTake into account what you have learned from your opponent and the questions that have arisen in the debate."
                 "----------------------------------------------------"
             )
-            llm_messages = self._system_messages + [article_information_message] + self._history + [
+            llm_messages = self._system_messages + self._chat_history + [
                 UserMessage(content=round_n_message, source="moderator")]
             result = await self._model_client.create(
                 messages=llm_messages,
@@ -258,7 +257,7 @@ class StructuredDebateAgent(BaseChatAgent):
             )
             parsed_response = StructuredArgument(**json.loads(result.content))
             argument_text = convert_structured_argument_to_text(parsed_response)
-            self._history.append(
+            self._chat_history.append(
                 AssistantMessage(
                     content=argument_text,
                     source=self.name
@@ -267,7 +266,7 @@ class StructuredDebateAgent(BaseChatAgent):
             response_message = TextMessage(content=argument_text, source=self.name)
             return Response(chat_message=response_message)
         else:
-            last_judge_message = [m for m in self._history if m.source == "judge_agent"][-1]
+            last_judge_message = [m for m in self._chat_history if m.source == "judge_agent"][-1]
             if f"@{self.name}" in last_judge_message.content or "@both" in last_judge_message.content:
                 round_n_message = (
                     "------- This message can only be seen by you -------\n"
@@ -275,7 +274,7 @@ class StructuredDebateAgent(BaseChatAgent):
                     f"\nDo not use @ to address participants in the response, this is only for the judge. Remember you are trying to convince the judge that the answer to the question '{self._question_text}' is '{self._options[self._option_to_defend_index]}'."
                     "----------------------------------------------------"
                 )
-                llm_messages = self._system_messages + [article_information_message] + self._history + [
+                llm_messages = self._system_messages + self._chat_history + [
                     UserMessage(content=round_n_message, source="moderator")]
                 result = await self._model_client.create(
                     messages=llm_messages,
@@ -284,7 +283,7 @@ class StructuredDebateAgent(BaseChatAgent):
                 )
                 parsed_response = ResponseToQuestion(**json.loads(result.content))
                 response_text = convert_response_to_question_to_text(parsed_response)
-                self._history.append(
+                self._chat_history.append(
                     AssistantMessage(
                         content=response_text,
                         source=self.name
@@ -293,12 +292,12 @@ class StructuredDebateAgent(BaseChatAgent):
                 response_message = TextMessage(content=response_text, source=self.name)
                 return Response(chat_message=response_message)
             else:
-                self._history.append(AssistantMessage(content="[remains silent]", source=self.name))
+                self._chat_history.append(AssistantMessage(content="[remains silent]", source=self.name))
                 response_message = TextMessage(content="[remains silent]", source=self.name)
                 return Response(chat_message=response_message)
 
     async def on_reset(self, cancellation_token: CancellationToken) -> None:
-        self._history = []
+        self._chat_history = []
         self.round = 0
 
     @property
@@ -320,7 +319,7 @@ async def run_structured_debate(article: UniqueSet, question_idx:int, is_correct
 
     structured_debate_agent_1 = StructuredDebateAgent(
         name="debate_agent_1",
-        model_client=OpenAIChatCompletionClient(model=llm_config.model, api_key=llm_config.api_key),
+        model_client=OpenAIChatCompletionClient(**llm_config.model_dump()),
         system_message=debater_system_message,
         article_title=article.title,
         article_text=article.article,
@@ -331,7 +330,7 @@ async def run_structured_debate(article: UniqueSet, question_idx:int, is_correct
     )
     structured_debate_agent_2 = StructuredDebateAgent(
         name="debate_agent_2",
-        model_client=OpenAIChatCompletionClient(model=llm_config.model, api_key=llm_config.api_key),
+        model_client=OpenAIChatCompletionClient(**llm_config.model_dump()),
         system_message=debater_system_message,
         article_title=article.title,
         article_text=article.article,
@@ -342,7 +341,7 @@ async def run_structured_debate(article: UniqueSet, question_idx:int, is_correct
     )
     judge_agent = JudgeAgent(
         name="judge_agent",
-        model_client=OpenAIChatCompletionClient(model=llm_config.model, api_key=llm_config.api_key),
+        model_client=OpenAIChatCompletionClient(**llm_config.model_dump()),
         system_message=judge_system_message,
         article_title=article.title,
         question_text=question_text,
@@ -358,8 +357,8 @@ async def run_structured_debate(article: UniqueSet, question_idx:int, is_correct
     return StructuredDebateResults(
         unique_set_id=article.set_unique_id,
         question_idx=question_idx,
-        answer=[judge_agent._last_response.answer]*n_rounds,
-        logprob=[judge_agent._last_response.top_log_probs] * n_rounds,
+        answer=[response.answer for response in judge_agent.response_history],
+        logprob=[response.top_log_probs for response in judge_agent.response_history],
         is_correct_option_first=is_correct_option_first,
         n_rounds=n_rounds,
         is_agent_defending_correct_option_first=is_agent_defending_correct_option_first,

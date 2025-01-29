@@ -68,17 +68,33 @@ class DebateAgent(BaseChatAgent):
                  max_rounds: int = 3):
         super().__init__(name=name, description="A Debate Agent")
         self._model_client = model_client
-        self._system_messages = [
-            SystemMessage(
-                content=system_message
-            ),
-        ]
+
         self._article_title = article_title
         self._article_text = article_text
         self._question_text = question_text
         self._options = options
         self._option_to_defend_index = option_to_defend_index
         self._chat_history = []
+        self._article_information = (
+            "------- This message can only be seen by you -------\n"
+            "Here is the article you will be discussing:\n"
+            f"Article Title: {self._article_title}\n"
+            "Article:\n"
+            "< Begin Article>\n"
+            f"{self._article_text}"
+            "<End Article>\n"
+            f"Question: {self._question_text}\n"
+            f"Options:\n"
+            f"A. {self._options[0]}\n"
+            f"B. {self._options[1]}\n"
+            "----------------------------------------------------"
+        )
+        self._system_messages = [
+            SystemMessage(
+                content=system_message
+            ),
+            UserMessage(content=self._article_information, source="moderator")
+        ]
         self.round = 0
         self._max_rounds = max_rounds
 
@@ -123,23 +139,7 @@ class DebateAgent(BaseChatAgent):
                 response_message = TextMessage(content="[remains silent]", source=self.name)
                 return Response(chat_message=response_message)
 
-        article_information = (
-            "------- This message can only be seen by you -------\n"
-            "Here is the article you will be discussing:\n"
-            f"Article Title: {self._article_title}\n"
-            "Article:\n"
-            "< Begin Article>\n"
-            f"{self._article_text}"
-            "<End Article>\n"
-            f"Question: {self._question_text}\n"
-            f"Options:\n"
-            f"A. {self._options[0]}\n"
-            f"B. {self._options[1]}\n"
-            "----------------------------------------------------"
-        )
-        article_information_message = UserMessage(content=article_information, source="moderator")
-        llm_messages = self._system_messages + [article_information_message] + self._chat_history + [
-            UserMessage(content=round_n_message, source="moderator")]
+        llm_messages = self._system_messages + self._chat_history + [UserMessage(content=round_n_message, source="moderator")]
         result = await self._model_client.create(messages=llm_messages, cancellation_token=cancellation_token)
         self._chat_history.append(
             AssistantMessage(
@@ -194,6 +194,10 @@ class JudgeAgent(BaseChatAgent):
         self._system_messages = [SystemMessage(content=system_message), UserMessage(content=self._article_information, source="moderator")]
         self.round = 0
 
+    @property
+    def logger(self) -> logging.Logger:
+        return logging.getLogger(__name__)
+
     def _ask_debaters_to_begin(self) -> Response:
         message = "We will now hear the debaters' arguments."
         self._chat_history.append(AssistantMessage(content=message, source=self.name))
@@ -205,7 +209,7 @@ class JudgeAgent(BaseChatAgent):
         return Response(chat_message=TextMessage(content=message, source=self.name))
 
     async def _ask_debaters_to_answer_question(self) -> Response:
-        message = (
+        prompt_message = (
             f"It is round {self.round} (of {self._max_rounds}) of the debate. "
             f"\nNow, do the following:"
             f"\n    * Select one or both agents to address"
@@ -214,7 +218,7 @@ class JudgeAgent(BaseChatAgent):
         llm_messages = (
             self._system_messages
             + self._chat_history
-            + [UserMessage(content=message, source="moderator")]
+            + [UserMessage(content=prompt_message, source="moderator")]
         )
         result = await self._model_client.create(
             messages=llm_messages,
@@ -229,7 +233,7 @@ class JudgeAgent(BaseChatAgent):
             message = f"@{parsed_response.selected_speaker} {parsed_response.question}"
         self._chat_history.append(AssistantMessage(content=message, source=self.name))
         response_message = TextMessage(content=message, source=self.name)
-        return Response(chat_message=response_message)
+        return Response(chat_message=response_message, inner_messages=[TextMessage(content=prompt_message, source=self.name)])
 
     async def on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Response:
         self.round += 1
@@ -262,17 +266,17 @@ class JudgeAgent(BaseChatAgent):
             )
         )
         response_message = TextMessage(content=str(result.content) + "\nDEBATE_COMPLETE", source=self.name)
-        return Response(chat_message=response_message)
+        return Response(chat_message=response_message,inner_messages=[TextMessage(content=self._get_decision_prompt_message(), source=self.name)])
 
     def _add_decision_to_response_history(self, result):
         parsed_response = ResponseModel(**json.loads(result.content))
         self.response_history.append(ResponseModelWithLogProb(
             answer=parsed_response.answer,
-            logprob=_get_top_log_probs_for_answer(result.logprobs)
+            top_log_probs=_get_top_log_probs_for_answer(result.logprobs)
         ))
 
-    async def _ask_model_for_tentative_decision(self, cancellation_token):
-        round_n_message = (
+    def _get_decision_prompt_message(self):
+        return (
             "------- This message can only be seen by you -------\n"
             f"The debate has concluded. It is time to make your decision. Given the conversation you've had with the debate agents, what is your final answer to the question?\n"
             f"Question: {self._question_text}\n"
@@ -281,6 +285,9 @@ class JudgeAgent(BaseChatAgent):
             f"B. {self._options[1]}\n"
             "----------------------------------------------------"
         )
+
+    async def _ask_model_for_tentative_decision(self, cancellation_token):
+        round_n_message = self._get_decision_prompt_message()
         llm_messages = (
                 self._system_messages
                 + self._chat_history
@@ -315,7 +322,6 @@ class JudgeAgent(BaseChatAgent):
         return (TextMessage,)
 
 
-
 async def run_unstructured_debate(article: UniqueSet, question_idx, is_correct_option_first: bool, is_agent_defending_correct_option_first: bool, n_rounds: int, llm_config: Dict) -> UnstructuredDebateResults:
     logger = logging.getLogger(__name__)
     logger.info(f"Running unstructured debate for question {question_idx} in unique set {article.set_unique_id} and is_correct_option_first={is_correct_option_first}, n_rounds={n_rounds}, is_agent_defending_correct_option_first={is_agent_defending_correct_option_first}.")
@@ -330,7 +336,7 @@ async def run_unstructured_debate(article: UniqueSet, question_idx, is_correct_o
 
     debate_agent_1 = DebateAgent(
         name="debate_agent_1",
-        model_client=OpenAIChatCompletionClient(model=llm_config.model, api_key=llm_config.api_key),
+        model_client=OpenAIChatCompletionClient(**llm_config.model_dump()),
         system_message=debater_system_message,
         article_title=article.title,
         article_text=article.article,
@@ -342,7 +348,7 @@ async def run_unstructured_debate(article: UniqueSet, question_idx, is_correct_o
 
     debate_agent_2 = DebateAgent(
         name="debate_agent_2",
-        model_client=OpenAIChatCompletionClient(model=llm_config.model, api_key=llm_config.api_key),
+        model_client=OpenAIChatCompletionClient(**llm_config.model_dump()),
         system_message=debater_system_message,
         article_title=article.title,
         article_text=article.article,
@@ -353,7 +359,7 @@ async def run_unstructured_debate(article: UniqueSet, question_idx, is_correct_o
     )
     judge_agent = JudgeAgent(
         name="judge_agent",
-        model_client=OpenAIChatCompletionClient(model=llm_config.model, api_key=llm_config.api_key),
+        model_client=OpenAIChatCompletionClient(**llm_config.model_dump()),
         system_message=judge_system_message,
         article_title=article.title,
         question_text=question_text,

@@ -34,6 +34,7 @@ class NaiveJudgeAgent(BaseChatAgent):
         llm_messages = self._system_messages + self._history
         result = await self._model_client.create(
             messages=llm_messages,
+            cancellation_token=cancellation_token,
             extra_create_args={
                 "response_format": ResponseModel,
                 "logprobs": True,
