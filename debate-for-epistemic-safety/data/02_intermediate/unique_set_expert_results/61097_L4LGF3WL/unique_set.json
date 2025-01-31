@@ -1,0 +1,101 @@
+{
+  "unique_set_id": "61097",
+  "results": [
+    {
+      "unique_set_id": "61097_L4LGF3WL",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": 0.0,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -21.875,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "61097_L4LGF3WL",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": 0.0,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -20.625,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    },
+    {
+      "unique_set_id": "61097_L4LGF3WL",
+      "question_idx": 1,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -3.1281633e-07,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -15.375,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "61097_L4LGF3WL",
+      "question_idx": 1,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": 0.0,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -18.5,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

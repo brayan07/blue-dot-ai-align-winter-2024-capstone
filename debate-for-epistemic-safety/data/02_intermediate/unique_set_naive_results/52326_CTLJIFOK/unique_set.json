@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "52326",
+  "results": [
+    {
+      "unique_set_id": "52326_CTLJIFOK",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.00055303273,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -7.500553,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "52326_CTLJIFOK",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.5759394,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -0.8259394,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

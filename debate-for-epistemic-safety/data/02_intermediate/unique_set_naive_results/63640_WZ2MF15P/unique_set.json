@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "63640",
+  "results": [
+    {
+      "unique_set_id": "63640_WZ2MF15P",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.10020667,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -2.3502066,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63640_WZ2MF15P",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.026300302,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -3.6513002,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

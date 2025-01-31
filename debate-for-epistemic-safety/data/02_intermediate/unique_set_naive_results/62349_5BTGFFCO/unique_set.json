@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "62349",
+  "results": [
+    {
+      "unique_set_id": "62349_5BTGFFCO",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.0011702254,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -6.75117,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "62349_5BTGFFCO",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -4.012684e-05,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -10.12504,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}
