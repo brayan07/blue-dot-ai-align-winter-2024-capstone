@@ -12,3 +12,4 @@ dash-bootstrap-components
 autogen-core
 autogen-ext[openai]
 autogen-agentchat
+gunicorn

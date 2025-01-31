@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir ./debate-for-epistemic-safety
 EXPOSE 8050
 
 # Run app.py when the container launches
-CMD ["python", "ui/app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:8050", "ui.app:server"]

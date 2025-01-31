@@ -99,9 +99,9 @@ def _normalize_log_prob_to_probability(log_prob: List[TopLogprob], is_correct_op
     return np.exp(correct_log_prob) / (np.exp(correct_log_prob) + np.exp(incorrect_log_prob))
 
 class ResultsViewingApplication:
-    def __init__(self, project_path: str):
+    def __init__(self, app: dash.Dash, project_path: str):
         self.project_path = project_path
-        self.app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+        self.app = app
         self.data_manager = ResultsDataManager()
         self._load_data()
         self._set_app_layout()
@@ -598,8 +598,14 @@ class ResultsViewingApplication:
             ])
         ])
 
-# Run the app
-if __name__ == '__main__':
+def _initialize_results_viewer():
+    app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
     root_dir = pathlib.Path(__file__).parent.parent.resolve()
-    app = ResultsViewingApplication((root_dir / "debate-for-epistemic-safety").as_posix())
-    app.app.run(host="0.0.0.0", port=8050)
+    return ResultsViewingApplication(app, (root_dir / "debate-for-epistemic-safety").as_posix())
+
+results_viewer = _initialize_results_viewer()
+server = results_viewer.app.server
+
+# Run the app in development mode
+if __name__ == '__main__':
+    results_viewer.app.run(host="0.0.0.0", port=8050, debug=True)
