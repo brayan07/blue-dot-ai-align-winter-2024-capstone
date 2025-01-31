@@ -1,0 +1,37 @@
+# Input
+quality_raw_train:
+  type: json.JSONDataset
+  filepath: "data/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped.train"
+
+quality_filtered_train:
+  type: json.JSONDataset
+  filepath: "data/01_raw/quality_filtered_train.json"
+
+quality_filtered_train_with_direct_answers:
+  type: pandas.CSVDataset
+  filepath: "data/02_intermediate/quality_filtered_train_with_direct_answers.json"
+
+quality_filtered_train_answers_with_biases:
+  type: pandas.CSVDataset
+  filepath: "data/02_intermediate/quality_filtered_train_answers_with_biases.csv"
+
+partitioned_quality_filtered_train:
+  type: partitions.PartitionedDataset
+  path: "data/01_raw/quality_filtered_train_partitioned"
+  dataset: json.JSONDataset
+
+quality_filtered_train_{set_unique_id}:
+  type: json.JSONDataset
+  filepath: "data/01_raw/quality_filtered_train_partitioned/{set_unique_id}/unique_set.json"
+
+# Output
+partitioned_unique_set_{kind}_results:
+  type: partitions.PartitionedDataset
+  path: "data/02_intermediate/unique_set_{kind}_results"
+  dataset: json.JSONDataset
+
+unique_set_{kind}_results_{set_unique_id}:
+  type: json.JSONDataset
+  filepath: "data/02_intermediate/unique_set_{kind}_results/{set_unique_id}/unique_set.json"
+
+
