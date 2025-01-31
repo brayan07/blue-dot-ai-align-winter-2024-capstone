@@ -2,6 +2,8 @@ import logging
 from enum import Enum
 from typing import List
 
+from autogen_agentchat.agents import AssistantAgent
+from autogen_agentchat.teams import RoundRobinGroupChat
 from llama_index.core import SummaryIndex, Document
 from llama_index.core.base.llms.types import ChatMessage
 from llama_index.core.node_parser import SentenceSplitter
@@ -10,14 +12,15 @@ from llama_index.core.query_engine import CitationQueryEngine
 from llama_index.llms.openai import OpenAI
 from llama_index.program.openai import OpenAIPydanticProgram
 from pydantic import BaseModel
+from autogen_agentchat.messages import TextMessage
+RoundRobinGroupChat
 
-from debate_for_epistemic_safety.pipelines.master.nodes import ArticleWithQuestions
+
+from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
 
 class ClaimTruthValues(Enum):
     CERTAINLY_FALSE = "CERTAINLY_FALSE"
-    LIKELY_FALSE = "LIKELY_FALSE"
     UNCERTAIN = "UNCERTAIN"
-    LIKELY_TRUE = "LIKELY_TRUE"
     CERTAINLY_TRUE = "CERTAINLY_TRUE"
 
 class ClaimEvaluation(BaseModel):
@@ -28,6 +31,7 @@ class ClaimEvaluation(BaseModel):
 class LLMConfig(BaseModel):
     model: str
     api_key: str
+    temperature: float = 0.2
 
 class Claim(BaseModel):
     text: str
@@ -37,7 +41,7 @@ class StructuredArgument(BaseModel):
     conclusion: Claim
 
 class Evaluator:
-    def __init__(self, article: ArticleWithQuestions, llm_config: LLMConfig, debug:bool = False):
+    def __init__(self, article: UniqueSet, llm_config: LLMConfig, debug:bool = False):
         self.article = article
         self.llm_config = llm_config
         self.debug = debug
@@ -95,6 +99,7 @@ class Evaluator:
         evaluations = []
         for claim in argument.premises:
             evaluations.append(self.evaluate_claim(claim))
+        evaluations.append(self.evaluate_claim(argument.conclusion))
         return evaluations
 
     def evaluate_claim(self, claim: Claim) -> ClaimEvaluation:
@@ -106,7 +111,9 @@ class Evaluator:
             citation_chunk_overlap=0
         )
         prompt = (
-            "Given the following claim, evaluate the truth value of the claim, indicating whether it is one of (CERTAINLY_FALSE, LIKELY_FALSE, UNCERTAIN, LIKELY_TRUE, CERTAINLY_TRUE)."
+            "Given the following claim, evaluate the truth value of the claim, indicating whether it is one of (CERTAINLY_FALSE, UNCERTAIN, CERTAINLY_TRUE)."
+            "\nYou should have a high bar for what counts as CERTAINLY_TRUE or CERTAINLY_FALSE; to mark a claim as one of these,"
+            " there should be incontrovertible evidence for the claim, and the claim should be specific enough that it can be definitively proven or disproven with the textual evidence." 
             "Add a list of node IDs that provide evidence for the truth value of the claim, and provide a reason for the truth value."
             f"\n\nClaim: {claim.text}"
         )

@@ -32,7 +32,7 @@ class Question(BaseModel):
     difficult: bool
 
 
-class ArticleWithQuestions(BaseModel):
+class UniqueSet(BaseModel):
     article_id: str
     set_unique_id: str
     source: str
@@ -43,17 +43,17 @@ class ArticleWithQuestions(BaseModel):
 
 
 class QualityData(BaseModel):
-    articles: List[ArticleWithQuestions]
+    unique_sets: List[UniqueSet]
 
 def filter_raw_quality_data(path: str):
     quality_data = _load_data_from_path(path)
-    filtered_articles = []
-    for article in quality_data.articles:
+    filtered_sets = []
+    for unique_set in quality_data.unique_sets:
         # 0. Only sourced from the Gutenberg dataset
-        if article.source != "Gutenberg":
+        if unique_set.source != "Gutenberg":
             continue
         filtered_questions = []
-        for question in article.questions:
+        for question in unique_set.questions:
             average_context_required = sum(val.untimed_eval2_context for val in question.validation) / len(
                 question.validation)
             best_distractors = [val.untimed_best_distractor for val in question.validation]
@@ -74,27 +74,36 @@ def filter_raw_quality_data(path: str):
             ):
                 filtered_questions.append(question)
         if filtered_questions:
-            filtered_articles.append(
-                ArticleWithQuestions(
-                    article_id=article.article_id,
-                    set_unique_id=article.set_unique_id,
-                    source=article.source,
-                    title=article.title,
-                    author=article.author,
-                    article=article.article,
+            filtered_sets.append(
+                UniqueSet(
+                    article_id=unique_set.article_id,
+                    set_unique_id=unique_set.set_unique_id,
+                    source=unique_set.source,
+                    title=unique_set.title,
+                    author=unique_set.author,
+                    article=unique_set.article,
                     questions=filtered_questions
                 )
             )
-    return QualityData(articles=filtered_articles).model_dump()
+    return QualityData(unique_sets=filtered_sets).model_dump()
+
+def partition_data(data: Dict) -> Dict[str,Dict[str,Any]]:
+    """Partition data by unique_set_id"""
+    data = QualityData(**data)
+    partitions = {}
+    for unique_set in data.unique_sets:
+        partitions[f"{unique_set.set_unique_id}/unique_set.json"] = unique_set.model_dump()
+    return partitions
+
 
 def _load_data_from_path(path:str) -> QualityData:
     json_str = "["
     with open(path, "r") as file:
         row_strs = [line for line in file]
     json_str += ",".join(row_strs) + "]"
-    return QualityData(articles=json.loads(json_str))
+    return QualityData(unique_sets=json.loads(json_str))
 
-def answer_question_directly(article: ArticleWithQuestions, response_mode, is_correct_first=True) -> int:
+def answer_question_directly(article: UniqueSet, response_mode, is_correct_first=True) -> int:
     open_ai_llm = OpenAI(api_key=open_ai_key, model="gpt-4o-mini")
     article_text = article.title + "\n" + article.article
     index = SummaryIndex.from_documents(
@@ -132,7 +141,7 @@ def answer_question_directly(article: ArticleWithQuestions, response_mode, is_co
 def get_direct_answers(dataset: Dict) -> pd.DataFrame:
     logger = logging.getLogger(__name__)
     dataset = QualityData(**dataset)
-    total_articles = len(dataset.articles)
+    total_articles = len(dataset.unique_sets)
     logger.info(f"Processing {total_articles} articles...")
 
     article_id = []
@@ -140,7 +149,7 @@ def get_direct_answers(dataset: Dict) -> pd.DataFrame:
     answers_best_distractor_first = []
     correct_answers = []
     response_mode = "compact"
-    for i,article in enumerate(dataset.articles):
+    for i,article in enumerate(dataset.unique_sets):
         logger.info(f"Processing article #{i+1}/{total_articles}...")
         correct_first = answer_question_directly(article, response_mode, True)
         best_distractor_first = answer_question_directly(article, response_mode, False)
@@ -263,7 +272,7 @@ def answer_question_with_citation_query_engine(article, scenario: Scenario, is_c
 def get_answers_with_biases(dataset: Dict) -> pd.DataFrame:
     logger = logging.getLogger(__name__)
     dataset = QualityData(**dataset)
-    total_articles = len(dataset.articles)
+    total_articles = len(dataset.unique_sets)
     logger.info(f"Processing {total_articles} articles...")
 
     article_id = []
@@ -272,7 +281,7 @@ def get_answers_with_biases(dataset: Dict) -> pd.DataFrame:
     correct_answers = []
     answers_with_bias = []
     response_mode = "compact"
-    for i, article in enumerate(dataset.articles):
+    for i, article in enumerate(dataset.unique_sets):
         logger.info(f"Processing article #{i+1}/{total_articles}...")
         for s in ["no_summary", "biased_wrong", 'unbiased']:
             for is_correct_first in [True, False]:

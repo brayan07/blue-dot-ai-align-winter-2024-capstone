@@ -10,11 +10,11 @@ from llama_index.core.query_engine import CitationQueryEngine
 from llama_index.core.tools import FunctionTool
 from llama_index.llms.openai import OpenAI
 
-from debate_for_epistemic_safety.pipelines.master.nodes import ArticleWithQuestions
+from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
 
 
 class SimpleDebate:
-    def __init__(self, article: ArticleWithQuestions, llm_config: dict):
+    def __init__(self, article: UniqueSet, llm_config: dict):
         # TODO: Currently will assume a single question per article.
         self.article = article
         self.llm_config = llm_config
