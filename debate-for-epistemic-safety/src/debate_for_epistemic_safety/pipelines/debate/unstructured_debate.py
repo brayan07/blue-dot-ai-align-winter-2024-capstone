@@ -233,7 +233,7 @@ class JudgeAgent(BaseChatAgent):
             message = f"@{parsed_response.selected_speaker} {parsed_response.question}"
         self._chat_history.append(AssistantMessage(content=message, source=self.name))
         response_message = TextMessage(content=message, source=self.name)
-        return Response(chat_message=response_message, inner_messages=[TextMessage(content=prompt_message, source=self.name)])
+        return Response(chat_message=response_message)
 
     async def on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Response:
         self.round += 1
@@ -266,7 +266,7 @@ class JudgeAgent(BaseChatAgent):
             )
         )
         response_message = TextMessage(content=str(result.content) + "\nDEBATE_COMPLETE", source=self.name)
-        return Response(chat_message=response_message,inner_messages=[TextMessage(content=self._get_decision_prompt_message(), source=self.name)])
+        return Response(chat_message=response_message)
 
     def _add_decision_to_response_history(self, result):
         parsed_response = ResponseModel(**json.loads(result.content))
