@@ -1,0 +1,149 @@
+{
+  "unique_set_id": "63477",
+  "results": [
+    {
+      "unique_set_id": "63477_O9LLFQB4",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": 0.0,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -18.875,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63477_O9LLFQB4",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -1.9361265e-07,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -16.5,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    },
+    {
+      "unique_set_id": "63477_O9LLFQB4",
+      "question_idx": 1,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": 0.0,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -19.0,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63477_O9LLFQB4",
+      "question_idx": 1,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": 0.0,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -19.0,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    },
+    {
+      "unique_set_id": "63477_O9LLFQB4",
+      "question_idx": 2,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.0021851186,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -6.1271853,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63477_O9LLFQB4",
+      "question_idx": 2,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.0013259569,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -6.626326,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

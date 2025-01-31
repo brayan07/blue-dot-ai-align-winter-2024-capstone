@@ -1,0 +1,101 @@
+{
+  "unique_set_id": "63631",
+  "results": [
+    {
+      "unique_set_id": "63631_J5XWKN5C",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": 0.0,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -20.5,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63631_J5XWKN5C",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -7.9418505e-06,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -11.750008,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    },
+    {
+      "unique_set_id": "63631_J5XWKN5C",
+      "question_idx": 1,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.05488228,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -2.9298823,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63631_J5XWKN5C",
+      "question_idx": 1,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.20141333,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -1.7014134,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

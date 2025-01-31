@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "63304",
+  "results": [
+    {
+      "unique_set_id": "63304_NMANYPP2",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.023245478,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -3.7732456,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63304_NMANYPP2",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.38687104,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -1.1368711,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

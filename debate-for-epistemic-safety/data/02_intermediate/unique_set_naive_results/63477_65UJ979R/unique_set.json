@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "63477",
+  "results": [
+    {
+      "unique_set_id": "63477_65UJ979R",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.00150236,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -6.5015025,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63477_65UJ979R",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.00055303273,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -7.500553,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

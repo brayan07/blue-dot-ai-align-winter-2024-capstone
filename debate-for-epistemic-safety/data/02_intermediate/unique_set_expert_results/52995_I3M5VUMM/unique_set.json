@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "52995",
+  "results": [
+    {
+      "unique_set_id": "52995_I3M5VUMM",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.0019286326,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -6.251929,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "52995_I3M5VUMM",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -6.9882217e-06,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -11.875007,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

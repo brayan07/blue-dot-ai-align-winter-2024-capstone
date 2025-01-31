@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "63875",
+  "results": [
+    {
+      "unique_set_id": "63875_TA3WI7DW",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.009755975,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -4.634756,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63875_TA3WI7DW",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.2254126,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -1.6004126,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

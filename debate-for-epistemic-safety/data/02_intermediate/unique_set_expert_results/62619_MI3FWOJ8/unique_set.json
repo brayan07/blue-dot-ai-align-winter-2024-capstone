@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "62619",
+  "results": [
+    {
+      "unique_set_id": "62619_MI3FWOJ8",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.026300302,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -3.6513002,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "62619_MI3FWOJ8",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.00010902656,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -9.125109,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "unique_set_id": "61405",
+  "results": [
+    {
+      "unique_set_id": "61405_DPAPHI73",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.08893948,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -2.4639394,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "61405_DPAPHI73",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.026300302,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -3.6513002,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    },
+    {
+      "unique_set_id": "61405_DPAPHI73",
+      "question_idx": 1,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.47407702,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -0.974077,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "61405_DPAPHI73",
+      "question_idx": 1,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.00020354039,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -8.500203,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

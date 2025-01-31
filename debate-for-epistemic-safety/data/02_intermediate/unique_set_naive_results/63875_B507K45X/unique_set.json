@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "63875",
+  "results": [
+    {
+      "unique_set_id": "63875_B507K45X",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -4.5491004e-05,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -10.000046,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63875_B507K45X",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -0.00029601678,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -8.125296,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}

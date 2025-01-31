@@ -1,0 +1,53 @@
+{
+  "unique_set_id": "63109",
+  "results": [
+    {
+      "unique_set_id": "63109_XYACUEX2",
+      "question_idx": 0,
+      "answer": [
+        "A"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -1.9361265e-07,
+            "bytes": [
+              65
+            ]
+          },
+          {
+            "logprob": -15.625,
+            "bytes": [
+              66
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": true
+    },
+    {
+      "unique_set_id": "63109_XYACUEX2",
+      "question_idx": 0,
+      "answer": [
+        "B"
+      ],
+      "logprob": [
+        [
+          {
+            "logprob": -1.9361265e-07,
+            "bytes": [
+              66
+            ]
+          },
+          {
+            "logprob": -15.875,
+            "bytes": [
+              65
+            ]
+          }
+        ]
+      ],
+      "is_correct_option_first": false
+    }
+  ]
+}
