@@ -602,4 +602,4 @@ class ResultsViewingApplication:
 if __name__ == '__main__':
     root_dir = pathlib.Path(__file__).parent.parent.resolve()
     app = ResultsViewingApplication((root_dir / "debate-for-epistemic-safety").as_posix())
-    app.app.run_server(debug=True)
+    app.app.run(host="0.0.0.0", port=8050)
