@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    image: debate-for-epistemic-safety
     ports:
       - "8050:8050"
     volumes:
