@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  app:
+  ui:
     build:
       context: .
       dockerfile: debate-ui/docker/Dockerfile
