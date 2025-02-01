@@ -3,6 +3,7 @@
 raw_quality_train_path: "data/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped.train"
 
 # Configuration for the OpenAI API
+# TODO: Set this up as a credential.
 llm_config:
   model: gpt-4o-mini
   # TODO: Replace with your API key
