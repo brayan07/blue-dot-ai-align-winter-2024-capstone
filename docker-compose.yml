@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  app:
+  ui:
     build:
       context: .
-      dockerfile: docker/Dockerfile
-    image: debate-for-epistemic-safety
+      dockerfile: debate-ui/docker/Dockerfile
+    image: debate-for-ai-alignment-ui
     ports:
       - "8050:8050"
     volumes:

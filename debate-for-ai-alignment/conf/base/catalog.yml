@@ -1,0 +1,45 @@
+# This file contains the catalog of datasets used in the project.
+
+# Root of GCS bucket for this project
+_gcp_bucket_root: "gs://blue-dot-ai-align-winter-2024-capstone"
+
+# Input
+quality_filtered_train:
+  type: json.JSONDataset
+  filepath: "${_gcp_bucket_root}/data/01_raw/quality_filtered_train.json"
+  credentials: gcp_data_sa
+
+quality_filtered_train_with_direct_answers:
+  type: pandas.CSVDataset
+  filepath: "${_gcp_bucket_root}/data/02_intermediate/quality_filtered_train_with_direct_answers.json"
+  credentials: gcp_data_sa
+
+quality_filtered_train_answers_with_biases:
+  type: pandas.CSVDataset
+  filepath: "${_gcp_bucket_root}/data/02_intermediate/quality_filtered_train_answers_with_biases.csv"
+  credentials: gcp_data_sa
+
+partitioned_quality_filtered_train:
+  type: partitions.PartitionedDataset
+  path: "${_gcp_bucket_root}/data/01_raw/quality_filtered_train_partitioned"
+  dataset: json.JSONDataset
+  credentials: gcp_data_sa
+
+quality_filtered_train_{set_unique_id}:
+  type: json.JSONDataset
+  filepath: "${_gcp_bucket_root}/data/01_raw/quality_filtered_train_partitioned/{set_unique_id}/unique_set.json"
+  credentials: gcp_data_sa
+
+# Output
+partitioned_unique_set_{kind}_results:
+  type: partitions.PartitionedDataset
+  path: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_results"
+  dataset: json.JSONDataset
+  credentials: gcp_data_sa
+
+unique_set_{kind}_results_{set_unique_id}:
+  type: json.JSONDataset
+  filepath: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_results/{set_unique_id}/unique_set.json"
+  credentials: gcp_data_sa
+
+
