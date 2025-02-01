@@ -6,44 +6,17 @@ build-backend = "setuptools.build_meta"
 requires-python = ">=3.9"
 name = "debate_for_epistemic_safety"
 readme = "README.md"
-dynamic = ["version"]
-dependencies = [
-    "ipython>=8.10",
-    "jupyterlab>=3.0",
-    "notebook",
-    "kedro[jupyter]~=0.19.10",
-    "kedro-datasets[pandas-csvdataset, pandas-exceldataset, pandas-parquetdataset, plotly-plotlydataset, plotly-jsondataset, matplotlib-matplotlibwriter]>=3.0",
-    "kedro-viz>=6.7.0",
-    "scikit-learn~=1.5.1",
-    "seaborn~=0.12.1"
-]
+dynamic = ["version", "dependencies", "optional-dependencies"]
 
 [project.scripts]
 "debate-for-epistemic-safety" = "debate_for_epistemic_safety.__main__:main"
 
 [project.entry-points."kedro.hooks"]
 
-[project.optional-dependencies]
-docs = [
-    "docutils<0.21",
-    "sphinx>=5.3,<7.3",
-    "sphinx_rtd_theme==2.0.0",
-    "nbsphinx==0.8.1",
-    "sphinx-autodoc-typehints==1.20.2",
-    "sphinx_copybutton==0.5.2",
-    "ipykernel>=5.3, <7.0",
-    "Jinja2<3.2.0",
-    "myst-parser>=1.0,<2.1"
-]
-dev = [
-    "pytest-cov~=3.0",
-    "pytest-mock>=1.7.1, <2.0",
-    "pytest~=7.2",
-    "ruff~=0.1.8"
-]
-
 [tool.setuptools.dynamic]
 version = {attr = "debate_for_epistemic_safety.__version__"}
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies = { docs = {file = ["requirements-docs.txt"]}, dev = {file = ["requirements-dev.txt"]}}
 
 [tool.setuptools.packages.find]
 where = ["src"]

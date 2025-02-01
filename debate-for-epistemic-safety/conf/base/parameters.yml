@@ -1,4 +1,9 @@
+# Path to raw Quality dataset
+# TODO: Download directly from Github
 raw_quality_train_path: "data/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped.train"
+
+# Configuration for the OpenAI API
 llm_config:
   model: gpt-4o-mini
-  api_key: ${oc.env:OPENAI_API_KEY}
+  # TODO: Replace with your API key
+  api_key: ""
