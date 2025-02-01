@@ -3,6 +3,9 @@
 # Set up this file to fail if any command fails
 set -e
 
+# Move to the root directory of the project
+cd ..
+
 # If a file called credentials.yml, move it to debate-for-ai-alignment/conf/local/credentials.yml,
 # otherwise throw an error
 if [ -f credentials.yml ]; then
