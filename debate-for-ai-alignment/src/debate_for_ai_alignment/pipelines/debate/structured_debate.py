@@ -2,6 +2,7 @@ from debate_for_ai_alignment.pipelines.debate.unstructured_debate import JudgeAg
 
 import json
 from typing import Sequence, Optional, Literal, Dict, Annotated
+import logging
 
 from autogen_agentchat.agents import BaseChatAgent
 from autogen_agentchat.base import Response
@@ -144,7 +145,7 @@ class ResponseToQuestion(BaseModel):
         description="The answer to the question. This should be a clear statement that directly answers the question."
     )
     supporting_facts: List[SupportingFact] = Field(
-        description="Supporting facts that back up the answer. These are not required if the answer is self-evident. Limited to a maximum of 3 supporting facts.",
+        description="Supporting facts that back up the answer. These are not required if the answer is self-evident. Limited to a maximum of 2 supporting facts.",
     )
 
 
@@ -169,9 +170,6 @@ def convert_structured_argument_to_text(structured_argument: StructuredArgument)
                 text += f"        * Quote {i + 1}.{j + 1}: {supporting_fact.quote}\n"
     text += f"* Conclusion: {structured_argument.conclusion}"
     return text
-
-
-import logging
 
 
 class StructuredDebateAgent(BaseChatAgent):
