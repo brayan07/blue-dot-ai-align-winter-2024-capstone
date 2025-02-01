@@ -17,5 +17,8 @@ EXPOSE 8050
 # Change the working directory to the app directory
 WORKDIR /app/debate-ui
 
+# Define entrypoint
+ENTRYPOINT ["sh", "/app/debate-ui/docker/scripts/entrypoint.sh"]
+
 # Run app.py when the container launches
 CMD ["gunicorn", "-b", "0.0.0.0:8050", "src.app:server"]
