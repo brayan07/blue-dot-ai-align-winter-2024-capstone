@@ -5,7 +5,7 @@ set -e
 
 # If a file called credentials.yml, move it to debate-for-ai-alignment/conf/local/credentials.yml,
 # otherwise throw an error
-if [ -f credentials.yml ]; then
+if [ -f /etc/secrets/credentials.yml ]; then
     cp /etc/secrets/credentials.yml /app/debate-for-ai-alignment/conf/local/credentials.yml
 else
     echo "credentials.yml not found"
@@ -14,7 +14,7 @@ fi
 
 # If a file called parameters.yml, move it to debate-for-ai-alignment/conf/local/parameters.yml,
 # otherwise throw an error
-if [ -f parameters.yml ]; then
+if [ -f /etc/secrets/parameters.yml ]; then
     cp /etc/secrets/parameters.yml /app/debate-for-ai-alignment/conf/local/parameters.yml
 else
     echo "parameters.yml not found"
