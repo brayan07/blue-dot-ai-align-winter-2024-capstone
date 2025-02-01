@@ -9,13 +9,13 @@ def create_pipeline(**kwargs):
                 func=filter_raw_quality_data,
                 inputs="params:raw_quality_train_path",
                 outputs="quality_filtered_train",
-                name="filter_raw_quality_data_train"
+                name="filter_raw_quality_data_train",
             ),
             node(
                 func=partition_data,
                 inputs="quality_filtered_train",
                 outputs="partitioned_quality_filtered_train",
-                name="partition_data_train"
-            )
+                name="partition_data_train",
+            ),
         ]
     )

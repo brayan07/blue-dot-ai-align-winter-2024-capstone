@@ -7,9 +7,13 @@ def get_context_from_article(article, question_idx, is_correct_option_first):
     article_title = article.title
     question_text = article.questions[question_idx].question
     correct_option_idx = article.questions[question_idx].gold_label - 1
-    best_distractor_idx = article.questions[question_idx].validation[0].untimed_best_distractor - 1
+    best_distractor_idx = (
+        article.questions[question_idx].validation[0].untimed_best_distractor - 1
+    )
     correct_answer_text = article.questions[question_idx].options[correct_option_idx]
-    distractor_answer_text = article.questions[question_idx].options[best_distractor_idx]
+    distractor_answer_text = article.questions[question_idx].options[
+        best_distractor_idx
+    ]
     if is_correct_option_first:
         first_option = correct_answer_text
         second_option = distractor_answer_text
@@ -32,7 +36,7 @@ def _get_top_log_probs_for_answer(log_probs: List[ChatCompletionTokenLogprob]):
     # Get the log prob values for the answer token, which should be the next token that is an A or B
     # Seek the A or B token
     answer_idx = None
-    for i, log_prob in enumerate(log_probs[colon_idx + 1:]):
+    for i, log_prob in enumerate(log_probs[colon_idx + 1 :]):
         if log_prob.token.strip() in ["A", "B"]:
             answer_idx = i
             break
