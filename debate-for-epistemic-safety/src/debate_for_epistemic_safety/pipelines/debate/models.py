@@ -4,7 +4,7 @@ from autogen_agentchat.base import TaskResult
 from autogen_core.models import TopLogprob
 from pydantic import BaseModel, root_validator, model_validator
 
-from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
+from debate_for_epistemic_safety.pipelines.preprocessing.models import UniqueSet
 
 
 class DebateResult(BaseModel):

@@ -1,5 +1,4 @@
 from debate_for_epistemic_safety.pipelines.debate.unstructured_debate import JudgeAgent
-from debate_for_epistemic_safety.pipelines.master.evaluator import LLMConfig
 
 import json
 from typing import Sequence, Optional, Literal, Dict, Annotated
@@ -16,7 +15,7 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from debate_for_epistemic_safety.pipelines.debate.models import StructuredDebateResults, ResponseModelWithLogProb, \
     ResponseModel
 from debate_for_epistemic_safety.pipelines.debate.utils import get_context_from_article
-from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
+from debate_for_epistemic_safety.pipelines.preprocessing.models import UniqueSet, LLMConfig
 from pydantic import BaseModel, Field, validator, field_validator, AfterValidator
 from typing import List, Optional
 

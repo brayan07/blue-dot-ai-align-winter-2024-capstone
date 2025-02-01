@@ -10,7 +10,7 @@ from debate_for_epistemic_safety.pipelines.debate.models import QuestionDebateRe
 from debate_for_epistemic_safety.pipelines.debate.naive import run_naive
 from debate_for_epistemic_safety.pipelines.debate.unstructured_debate import run_unstructured_debate
 from debate_for_epistemic_safety.pipelines.debate.structured_debate import run_structured_debate
-from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
+from debate_for_epistemic_safety.pipelines.preprocessing.models import UniqueSet
 
 
 def run_naive_for_unique_set(unique_set: Dict, llm_config: Dict) -> Dict:

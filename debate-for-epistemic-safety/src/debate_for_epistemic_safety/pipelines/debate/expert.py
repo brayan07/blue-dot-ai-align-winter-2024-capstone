@@ -14,8 +14,7 @@ from debate_for_epistemic_safety.pipelines.debate.models import ExpertJudgeResul
     ResponseModelWithLogProb
 from debate_for_epistemic_safety.pipelines.debate.naive import NaiveJudgeAgent
 from debate_for_epistemic_safety.pipelines.debate.utils import get_context_from_article, _get_top_log_probs_for_answer
-from debate_for_epistemic_safety.pipelines.master.evaluator import LLMConfig
-from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
+from debate_for_epistemic_safety.pipelines.preprocessing.models import UniqueSet, LLMConfig
 
 EXPERT_JUDGE_SYSTEM_MESSAGE = f"""
 You are a comprehension answering agent. You will be asked questions about an article.

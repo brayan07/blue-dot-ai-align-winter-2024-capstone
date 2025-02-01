@@ -19,8 +19,7 @@ from pydantic import BaseModel
 
 from debate_for_epistemic_safety.pipelines.debate.models import UniqueSetNaiveJudgeResults, UniqueSetExpertJudgeResults, \
     UniqueSetConsultancyResults, UniqueSetUnstructuredDebateResults, UniqueSetStructuredDebateResults, DebateResult
-from debate_for_epistemic_safety.pipelines.master.evaluator import Evaluator, LLMConfig
-from debate_for_epistemic_safety.pipelines.master.nodes import QualityData, UniqueSet
+from debate_for_epistemic_safety.pipelines.preprocessing.models import UniqueSet, QualityData, LLMConfig
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

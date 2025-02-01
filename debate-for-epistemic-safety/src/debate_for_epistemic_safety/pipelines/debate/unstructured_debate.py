@@ -14,8 +14,7 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from debate_for_epistemic_safety.pipelines.debate.models import ResponseModelWithLogProb, \
     ResponseModel, UnstructuredDebateResults
 from debate_for_epistemic_safety.pipelines.debate.utils import get_context_from_article, _get_top_log_probs_for_answer
-from debate_for_epistemic_safety.pipelines.master.evaluator import LLMConfig
-from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
+from debate_for_epistemic_safety.pipelines.preprocessing.models import UniqueSet, LLMConfig
 
 debater_system_message = """
 You are a debate agent. Your job is to convince an agent, called the 'judge', that the answer to a question about a given article is the option given to you to defend . The 'judge' does not have access to the article, but you do.

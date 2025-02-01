@@ -12,8 +12,7 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from debate_for_epistemic_safety.pipelines.debate.models import NaiveJudgeResults, ResponseModel, \
     ResponseModelWithLogProb
 from debate_for_epistemic_safety.pipelines.debate.utils import _get_top_log_probs_for_answer, get_context_from_article
-from debate_for_epistemic_safety.pipelines.master.evaluator import LLMConfig
-from debate_for_epistemic_safety.pipelines.master.nodes import UniqueSet
+from debate_for_epistemic_safety.pipelines.preprocessing.models import UniqueSet, LLMConfig
 
 
 class NaiveJudgeAgent(BaseChatAgent):
