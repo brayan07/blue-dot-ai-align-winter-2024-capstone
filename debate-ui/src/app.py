@@ -590,7 +590,10 @@ class ResultsViewingApplication:
         self.app.layout = dbc.Container(
             [
                 dbc.Row([html.H1("Review of Debate Results")]),
+                html.Br(),
                 dbc.Row([dbc.Card(dcc.Markdown(APP_INSTRUCTIONS))]),
+                html.Br(),
+                dbc.Row([html.H2("Select a Unique Set and Question")]),
                 dbc.Row(
                     [
                         dbc.Card(
@@ -598,7 +601,7 @@ class ResultsViewingApplication:
                                 dbc.Col(
                                     html.Div(
                                         [
-                                            html.H2("Unique Set ID"),
+                                            html.H4("Unique Set ID"),
                                             dcc.Dropdown(
                                                 id="unique-set-dropdown",
                                                 options=[
@@ -615,7 +618,7 @@ class ResultsViewingApplication:
                                 dbc.Col(
                                     html.Div(
                                         [
-                                            html.H2("Question"),
+                                            html.H4("Question"),
                                             dcc.Dropdown(
                                                 id="question-dropdown",
                                                 options=[],
@@ -630,6 +633,7 @@ class ResultsViewingApplication:
                 ),
                 html.Br(),
                 dbc.Row([html.H2("Article Information")]),
+                html.Br(),
                 dbc.Row(
                     dbc.Card(
                         [
@@ -676,7 +680,7 @@ class ResultsViewingApplication:
                 html.Br(),
                 dbc.Row(
                     [
-                        html.H2("Protocol Settings"),
+                        html.H2(" Select Protocol Settings"),
                     ]
                 ),
                 html.Br(),
@@ -687,7 +691,7 @@ class ResultsViewingApplication:
                                 # Debate Style picker
                                 dbc.Col(
                                     [
-                                        html.H3("Debate Style"),
+                                        html.H4("Debate Style"),
                                         dcc.Dropdown(
                                             id="debate-style-dropdown",
                                             placeholder="Select a debate style",
@@ -697,7 +701,7 @@ class ResultsViewingApplication:
                                 dbc.Col(
                                     [
                                         # Selector for whether correct option is presented first
-                                        html.H3("Correct Option Order"),
+                                        html.H4("Correct Option Order"),
                                         dcc.Dropdown(
                                             id="correct-option-order-dropdown",
                                             options=[
