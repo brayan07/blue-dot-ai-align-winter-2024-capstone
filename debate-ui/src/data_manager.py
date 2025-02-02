@@ -3,8 +3,13 @@ from typing import Union, Dict, List
 
 from pydantic import BaseModel
 
-from debate_for_ai_alignment.pipelines.debate.models import UniqueSetNaiveJudgeResults, UniqueSetExpertJudgeResults, \
-    UniqueSetConsultancyResults, UniqueSetUnstructuredDebateResults, UniqueSetStructuredDebateResults
+from debate_for_ai_alignment.pipelines.debate.models import (
+    UniqueSetNaiveJudgeResults,
+    UniqueSetExpertJudgeResults,
+    UniqueSetConsultancyResults,
+    UniqueSetUnstructuredDebateResults,
+    UniqueSetStructuredDebateResults,
+)
 from debate_for_ai_alignment.pipelines.preprocessing.models import UniqueSet
 
 

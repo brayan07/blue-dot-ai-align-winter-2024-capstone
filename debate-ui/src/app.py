@@ -1,18 +1,16 @@
 import logging
 import pathlib
-from collections import defaultdict
-from typing import Union, Dict, List, Sequence
+from typing import List
 
 import dash
 import numpy as np
 from autogen_core.models import TopLogprob
-from dash import dcc, html, Input, Output, State, ALL
+from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 
 
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
-from pydantic import BaseModel
 
 from debate_for_ai_alignment.pipelines.debate.models import (
     UniqueSetNaiveJudgeResults,
@@ -38,6 +36,7 @@ NAME_TO_RESULT_CLASS_MAP = {
     "structured_debate": UniqueSetStructuredDebateResults,
 }
 
+
 def _normalize_log_prob_to_probability(
     log_prob: List[TopLogprob], is_correct_option_first: bool
 ) -> float:
@@ -53,7 +52,11 @@ def _normalize_log_prob_to_probability(
         np.exp(correct_log_prob) + np.exp(incorrect_log_prob)
     )
 
+
 APP_INSTRUCTIONS = (
+    "## Introduction\n"
+    "This application allows you to review the results of different debate protocols on a set of questions "
+    "from the [QuALITY dataset](https://github.com/nyu-mll/quality).\n"
     "## Instructions\n"
     "1. Select a unique set ID from the dropdown menu. These ids corresponds to a unique set of questions written by the same author on a single article."
     "  Different 'unique-sets' may contain questions on the same article.\n"
@@ -471,21 +474,23 @@ class ResultsViewingApplication:
             confidence_card = self._get_confidence_card(round_n=i, result=result)
             components.append(
                 dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.H3(f"Round {i+1}"),
-                                dbc.Row(
-                                    [
-                                        dbc.Col(cards[0]),
-                                        dbc.Col(cards[1]),
-                                        dbc.Col(cards[2]),
-                                        dbc.Col(confidence_card),
-                                    ]
-                                ),
-                            ]
-                        )
-                    ]
+                    dbc.Card(
+                        [
+                            dbc.Col(
+                                [
+                                    html.H3(f"Round {i+1}"),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(cards[0]),
+                                            dbc.Col(cards[1]),
+                                            dbc.Col(cards[2]),
+                                            dbc.Col(confidence_card),
+                                        ]
+                                    ),
+                                ]
+                            )
+                        ]
+                    )
                 )
             )
         return components
@@ -585,84 +590,88 @@ class ResultsViewingApplication:
         self.app.layout = dbc.Container(
             [
                 dbc.Row([html.H1("Review of Debate Results")]),
-                dbc.Row([
-                    dcc.Markdown(APP_INSTRUCTIONS)
-                ]),
+                dbc.Row([dbc.Card(dcc.Markdown(APP_INSTRUCTIONS))]),
                 dbc.Row(
                     [
-                        dbc.Col(
-                            html.Div(
-                                [
-                                    html.H2("Unique Set ID"),
-                                    dcc.Dropdown(
-                                        id="unique-set-dropdown",
-                                        options=[
-                                            {"label": i, "value": i}
-                                            for i in sorted(
-                                                self.data_manager.unique_set_ids
-                                            )
-                                        ],
-                                        placeholder="Select a unique set ID.",
+                        dbc.Card(
+                            [
+                                dbc.Col(
+                                    html.Div(
+                                        [
+                                            html.H2("Unique Set ID"),
+                                            dcc.Dropdown(
+                                                id="unique-set-dropdown",
+                                                options=[
+                                                    {"label": i, "value": i}
+                                                    for i in sorted(
+                                                        self.data_manager.unique_set_ids
+                                                    )
+                                                ],
+                                                placeholder="Select a unique set ID.",
+                                            ),
+                                        ]
                                     ),
-                                ]
-                            ),
-                        ),
-                        dbc.Col(
-                            html.Div(
-                                [
-                                    html.H2("Question"),
-                                    dcc.Dropdown(
-                                        id="question-dropdown",
-                                        options=[],
-                                        placeholder="Select a question",
+                                ),
+                                dbc.Col(
+                                    html.Div(
+                                        [
+                                            html.H2("Question"),
+                                            dcc.Dropdown(
+                                                id="question-dropdown",
+                                                options=[],
+                                                placeholder="Select a question",
+                                            ),
+                                        ]
                                     ),
-                                ]
-                            ),
-                        ),
+                                ),
+                            ]
+                        )
                     ]
                 ),
                 html.Br(),
+                dbc.Row([html.H2("Article Information")]),
                 dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.H2("Article Information"),
-                                html.H3("Article & Question Metadata"),
-                                dbc.Card(
-                                    [
-                                        # text box, making sure if there are multiple lines, it will be scrollable
-                                        html.Pre(id="article-info")
-                                    ]
-                                ),
-                                html.H3("Article Content"),
-                                # Collapse button for article content
-                                dbc.Button(
-                                    "Collapse/Expand Article Content",
-                                    id="toggle-article-content-button",
-                                    color="primary",
-                                    className="mb-3",
-                                ),
-                                dbc.Collapse(
-                                    [
-                                        dbc.Card(
-                                            [
-                                                # Use markdown to render the article content, but make the box a fixed size and scrollable
-                                                dcc.Markdown(
-                                                    id="article-content",
-                                                    style={
-                                                        "height": "500px",
-                                                        "overflow": "scroll",
-                                                    },
-                                                )
-                                            ]
-                                        ),
-                                    ],
-                                    id="article-collapse",
-                                    is_open=False,
-                                ),
-                            ]
-                        ),
-                    ]
+                    dbc.Card(
+                        [
+                            dbc.Col(
+                                [
+                                    html.H3("Article & Question Metadata"),
+                                    dbc.Card(
+                                        [
+                                            # text box, making sure if there are multiple lines, it will be scrollable
+                                            html.Pre(id="article-info")
+                                        ]
+                                    ),
+                                    html.H3("Article Content"),
+                                    # Collapse button for article content
+                                    dbc.Button(
+                                        "Collapse/Expand Article Content",
+                                        id="toggle-article-content-button",
+                                        color="primary",
+                                        className="mb-3",
+                                    ),
+                                    dbc.Collapse(
+                                        [
+                                            dbc.Card(
+                                                [
+                                                    # Use markdown to render the article content, but make the box a fixed size and scrollable
+                                                    dcc.Markdown(
+                                                        id="article-content",
+                                                        style={
+                                                            "height": "500px",
+                                                            "overflow": "scroll",
+                                                        },
+                                                    )
+                                                ]
+                                            ),
+                                        ],
+                                        id="article-collapse",
+                                        is_open=False,
+                                    ),
+                                ]
+                            ),
+                        ]
+                    )
                 ),
                 html.Br(),
                 dbc.Row(
@@ -673,63 +682,67 @@ class ResultsViewingApplication:
                 html.Br(),
                 dbc.Row(
                     [
-                        # Debate Style picker
-                        dbc.Col(
+                        dbc.Card(
                             [
-                                html.H3("Debate Style"),
-                                dcc.Dropdown(
-                                    id="debate-style-dropdown",
-                                    placeholder="Select a debate style",
+                                # Debate Style picker
+                                dbc.Col(
+                                    [
+                                        html.H3("Debate Style"),
+                                        dcc.Dropdown(
+                                            id="debate-style-dropdown",
+                                            placeholder="Select a debate style",
+                                        ),
+                                    ]
+                                ),
+                                dbc.Col(
+                                    [
+                                        # Selector for whether correct option is presented first
+                                        html.H3("Correct Option Order"),
+                                        dcc.Dropdown(
+                                            id="correct-option-order-dropdown",
+                                            options=[
+                                                # {"label": "Correct option first", "value": True},
+                                                # {"label": "Incorrect option first", "value": False},
+                                            ],
+                                            placeholder="Select the order of the correct option",
+                                        ),
+                                    ]
+                                ),
+                                dbc.Col(
+                                    [
+                                        # Drop down asking ofor value of is_agent_defending_correct_option_first
+                                        html.H3("Order of Agents"),
+                                        dcc.Dropdown(
+                                            id="is-agent-defending-correct-option-first-dropdown",
+                                            options=[
+                                                {
+                                                    "label": "Agent defending correct option goes first",
+                                                    "value": True,
+                                                },
+                                                {
+                                                    "label": "Agent is defending incorrect option first",
+                                                    "value": False,
+                                                },
+                                            ],
+                                            placeholder="Select which agent goes first",
+                                        ),
+                                    ],
+                                    id="is-agent-defending-correct-option-first-dropdown-container",
+                                ),
+                                dbc.Col(
+                                    [
+                                        # Drop down asking ofor value of is_agent_defending_correct_option_first
+                                        html.H3("Consultant's Position"),
+                                        dcc.Dropdown(
+                                            id="is-consultant-defending-correct-option",
+                                            options=[],
+                                            placeholder="Select which agent goes first",
+                                        ),
+                                    ],
+                                    id="is-consultant-defending-correct-option-first-dropdown-container",
                                 ),
                             ]
-                        ),
-                        dbc.Col(
-                            [
-                                # Selector for whether correct option is presented first
-                                html.H3("Correct Option Order"),
-                                dcc.Dropdown(
-                                    id="correct-option-order-dropdown",
-                                    options=[
-                                        # {"label": "Correct option first", "value": True},
-                                        # {"label": "Incorrect option first", "value": False},
-                                    ],
-                                    placeholder="Select the order of the correct option",
-                                ),
-                            ]
-                        ),
-                        dbc.Col(
-                            [
-                                # Drop down asking ofor value of is_agent_defending_correct_option_first
-                                html.H3("Order of Agents"),
-                                dcc.Dropdown(
-                                    id="is-agent-defending-correct-option-first-dropdown",
-                                    options=[
-                                        {
-                                            "label": "Agent defending correct option goes first",
-                                            "value": True,
-                                        },
-                                        {
-                                            "label": "Agent is defending incorrect option first",
-                                            "value": False,
-                                        },
-                                    ],
-                                    placeholder="Select which agent goes first",
-                                ),
-                            ],
-                            id="is-agent-defending-correct-option-first-dropdown-container",
-                        ),
-                        dbc.Col(
-                            [
-                                # Drop down asking ofor value of is_agent_defending_correct_option_first
-                                html.H3("Consultant's Position"),
-                                dcc.Dropdown(
-                                    id="is-consultant-defending-correct-option",
-                                    options=[],
-                                    placeholder="Select which agent goes first",
-                                ),
-                            ],
-                            id="is-consultant-defending-correct-option-first-dropdown-container",
-                        ),
+                        )
                     ]
                 ),
                 html.Br(),
@@ -747,10 +760,12 @@ class ResultsViewingApplication:
                 dbc.Row(
                     [
                         dbc.Collapse(
-                            dbc.Card(
-                                id="debate-container",
-                                children=[],
-                            ),
+                            [
+                                dbc.Card(
+                                    id="debate-container",
+                                    children=[],
+                                )
+                            ],
                             id="debate-collapse",
                             is_open=True,
                         )

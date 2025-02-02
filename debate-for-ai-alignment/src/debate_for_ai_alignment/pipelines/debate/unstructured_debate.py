@@ -18,7 +18,8 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from debate_for_ai_alignment.pipelines.debate.models import (
     ResponseModelWithLogProb,
     ResponseModel,
-    UnstructuredDebateResults, QuestionForAgent,
+    UnstructuredDebateResults,
+    QuestionForAgent,
 )
 from debate_for_ai_alignment.pipelines.debate.utils import (
     get_context_from_article,
