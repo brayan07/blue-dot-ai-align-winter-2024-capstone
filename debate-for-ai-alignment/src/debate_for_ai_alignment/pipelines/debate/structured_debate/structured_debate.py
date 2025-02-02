@@ -1,5 +1,4 @@
-from debate_for_ai_alignment.pipelines.debate.structured_debate.models import StructuredArgument, StructuredRebuttal, \
-    ResponseToQuestion
+from .models import StructuredArgument, StructuredRebuttal, ResponseToQuestion
 from debate_for_ai_alignment.pipelines.debate.unstructured_debate import JudgeAgent
 
 import json

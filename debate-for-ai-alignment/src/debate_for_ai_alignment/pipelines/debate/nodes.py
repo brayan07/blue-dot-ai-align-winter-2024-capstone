@@ -1,12 +1,9 @@
 import asyncio
-from logging import getLogger
 from typing import Dict, Callable, Union
 
 from debate_for_ai_alignment.pipelines.debate.consultancy import run_consultancy
 from debate_for_ai_alignment.pipelines.debate.expert import run_expert
 from debate_for_ai_alignment.pipelines.debate.models import (
-    QuestionDebateResults,
-    ArticleDebateResults,
     UniqueSetNaiveJudgeResults,
     UniqueSetExpertJudgeResults,
     UniqueSetConsultancyResults,
