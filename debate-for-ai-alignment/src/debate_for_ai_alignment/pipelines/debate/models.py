@@ -2,7 +2,7 @@ from typing import Literal, List
 
 from autogen_agentchat.base import TaskResult
 from autogen_core.models import TopLogprob
-from pydantic import BaseModel, root_validator, model_validator
+from pydantic import BaseModel, root_validator, model_validator, Field
 
 from debate_for_ai_alignment.pipelines.preprocessing.models import UniqueSet
 
@@ -97,3 +97,12 @@ class ResponseModel(BaseModel):
 
 class ResponseModelWithLogProb(ResponseModel):
     top_log_probs: List[TopLogprob]
+
+
+class QuestionForAgent(BaseModel):
+    selected_speaker: Literal["debate_agent_1", "debate_agent_2", "both"] = Field(
+        description="The agent to address the question to. If 'both', the question will be asked to both agents."
+    )
+    question: str = Field(
+        description="The question to be asked of the selected speaker. Does not include addresses to the agent as these are added automatically as part of scaffolding."
+    )

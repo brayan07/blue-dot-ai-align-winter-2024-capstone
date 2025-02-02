@@ -1,12 +1,9 @@
 import asyncio
-from logging import getLogger
 from typing import Dict, Callable, Union
 
 from debate_for_ai_alignment.pipelines.debate.consultancy import run_consultancy
 from debate_for_ai_alignment.pipelines.debate.expert import run_expert
 from debate_for_ai_alignment.pipelines.debate.models import (
-    QuestionDebateResults,
-    ArticleDebateResults,
     UniqueSetNaiveJudgeResults,
     UniqueSetExpertJudgeResults,
     UniqueSetConsultancyResults,
@@ -95,7 +92,7 @@ async def _run_consultancy_for_unique_set(
     for question_idx in range(len(unique_set.questions)):
         for is_correct_option_first in [True, False]:
             for is_defending_correct in [True, False]:
-                for n_rounds in [4]:
+                for n_rounds in [5]:
                     consultancy_result_futures.append(
                         run_consultancy(
                             unique_set,
