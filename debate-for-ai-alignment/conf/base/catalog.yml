@@ -37,6 +37,12 @@ partitioned_unique_set_{kind}_results:
   dataset: json.JSONDataset
   credentials: gcp_data_sa
 
+partitioned_unique_set_{kind}_results@incremental:
+  type: partitions.IncrementalDataset
+  path: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_results"
+  dataset: json.JSONDataset
+  credentials: gcp_data_sa
+
 unique_set_{kind}_results_{set_unique_id}:
   type: json.JSONDataset
   filepath: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_results/{set_unique_id}/unique_set.json"

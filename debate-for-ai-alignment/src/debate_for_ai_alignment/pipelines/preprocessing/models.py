@@ -9,7 +9,6 @@ class Validation(BaseModel):
     untimed_eval2_context: int
     untimed_best_distractor: int
 
-
 class Question(BaseModel):
     question: str
     options: List[str]

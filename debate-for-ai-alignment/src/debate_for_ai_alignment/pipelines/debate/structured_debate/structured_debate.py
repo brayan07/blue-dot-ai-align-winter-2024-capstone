@@ -1,7 +1,9 @@
+from debate_for_ai_alignment.pipelines.debate.structured_debate.models import StructuredArgument, StructuredRebuttal, \
+    ResponseToQuestion
 from debate_for_ai_alignment.pipelines.debate.unstructured_debate import JudgeAgent
 
 import json
-from typing import Sequence, Optional, Literal, Dict, Annotated
+from typing import Sequence, Dict
 import logging
 
 from autogen_agentchat.agents import BaseChatAgent
@@ -20,14 +22,9 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 
 from debate_for_ai_alignment.pipelines.debate.models import (
     StructuredDebateResults,
-    ResponseModelWithLogProb,
-    ResponseModel,
 )
 from debate_for_ai_alignment.pipelines.debate.utils import get_context_from_article
 from debate_for_ai_alignment.pipelines.preprocessing.models import UniqueSet, LLMConfig
-from pydantic import BaseModel, Field, validator, field_validator, AfterValidator
-from typing import List, Optional
-
 
 debater_system_message = """
 You are a debate agent. Your job is to convince an agent, called the 'judge', that the answer to a question about a given article is the option given to you to defend . The 'judge' does not have access to the article, but you do.
@@ -72,62 +69,6 @@ Debate Progression
 """
 
 
-def ensure_in_quotes(value: str) -> str:
-    if (
-        value
-        and not (value.startswith('"') and value.endswith('"'))
-        and not (value.startswith("“") and value.endswith("”"))
-    ):
-        value = value.strip()
-        value = f"“{value}”"
-    return value
-
-
-class SupportingFact(BaseModel):
-    fact: str = Field(
-        description="A fact supporting the claim. This should be a plain factual statement about the article or events therein. Do not include opinions or interpretations about the fact."
-    )
-    quote: Annotated[Optional[str], AfterValidator(ensure_in_quotes)] = Field(
-        description="A verbatim quote from the article that supports the fact. This is optional, and should be included only if advantageous to the argument."
-    )
-
-
-class Premise(BaseModel):
-    premise: str = Field(
-        description="A premise that supports the conclusion. This should be a logical statement that, along with the other premises, leads to the conclusion."
-    )
-    supporting_facts: List[SupportingFact] = Field(
-        description="Supporting facts that back up the premise. These are not required if the premise is self-evident. Limited to a maximum of 2 supporting facts.",
-    )
-
-
-class StructuredArgument(BaseModel):
-    premises: List[Premise] = Field(
-        description="A list of premises that support the conclusion. These should be logical statements that, taken together, should clearly support the conclusion, even for someone who hasn't read the article. Limited to a maximum of 3 premises.",
-    )
-    conclusion: str = Field(
-        description="The conclusion that the premises lead to. This should be a clear statement that follows logically from the premises."
-    )
-
-
-class CounterPremise(BaseModel):
-    counter_premise: str = Field(
-        description="Statement expressing what is wrong with the opponent's premise."
-    )
-    supporting_facts: List[SupportingFact] = Field(
-        description="Supporting facts that back up the counter-premise. These are not required if the counter-premise is self-evident. Limited to a maximum of 2 supporting facts.",
-    )
-
-
-class StructuredRebuttal(BaseModel):
-    counter_premises: List[CounterPremise] = Field(
-        description="A list of counter-premises that refute the opponent's premises. These should be logical statements that, taken together, should clearly refute the opponent's argument. Limited to a maximum of 3 counter-premises.",
-    )
-    conclusion: str = Field(
-        description="The conclusion that the counter-premises lead to. This should be a clear statement that follows logically from the counter-premises."
-    )
-
-
 def convert_structured_rebuttal_to_text(structured_rebuttal: StructuredRebuttal) -> str:
     text = ""
     for i, counter_premise in enumerate(structured_rebuttal.counter_premises):
@@ -138,15 +79,6 @@ def convert_structured_rebuttal_to_text(structured_rebuttal: StructuredRebuttal)
                 text += f"        * Quote {i+1}.{j + 1}: {supporting_fact.quote}\n"
     text += f"* Conclusion: {structured_rebuttal.conclusion}"
     return text
-
-
-class ResponseToQuestion(BaseModel):
-    answer: str = Field(
-        description="The answer to the question. This should be a clear statement that directly answers the question."
-    )
-    supporting_facts: List[SupportingFact] = Field(
-        description="Supporting facts that back up the answer. These are not required if the answer is self-evident. Limited to a maximum of 2 supporting facts.",
-    )
 
 
 def convert_response_to_question_to_text(
