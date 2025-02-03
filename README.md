@@ -3,11 +3,12 @@
 ## TLDR; for anyone interested in using debate as a method of AI oversight.
   * Positional bias should absolutely be taken into account when designing debate experiments and evaluations, and this
     includes not only the order in which options are presented, but also the order in which agents speak.
-  * To reduce the likelihood of "self-defeating behavior", it may be beneficial to provide prompt scaffolding that steers
-    the agents, and judge, when using LLM judges, through each round. 
+  * To reduce the likelihood of "self-defeating behavior", where one AI debater prematurely concedes to the other, 
+    it may be beneficial to provide prompt scaffolding that steers the agents, and judge through each round. 
   * I would recommend using [AutoGen](https://microsoft.github.io/autogen/stable/index.html) to facilitate the creation 
     of this scaffolding, rather than attempting to implement debates from scratch.
-    * You can use the debate protocols I implemented in this [repo](debate-for-ai-alignment/src/debate_for_ai_alignment/pipelines/debate) as a starting point if you're curious about using [AutoGen](https://microsoft.github.io/autogen/stable/index.html) for this purpose.
+    * You can use the debate protocols I implemented in this [repo](debate-for-ai-alignment/src/debate_for_ai_alignment/pipelines/debate) 
+      as a starting point if you're curious about using [AutoGen](https://microsoft.github.io/autogen/stable/index.html) for this purpose.
   * You can view all the debate transcripts for the experiments I conducted in a web app [here](https://quality-data-debate-app.onrender.com/).
 
 ## Overview
