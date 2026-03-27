@@ -158,9 +158,11 @@ python -m src.app
 
 Then open http://localhost:8050.
 
+> **Note:** The local viewer loads data from GCS via the Kedro catalog, so you still need GCP credentials configured (see [step 5](#data-access)).
+
 ### 8. Explore the analysis notebooks
 
-Two Jupyter notebooks are included for exploring and analyzing results:
+Three Jupyter notebooks are included for exploring and analyzing results:
 
 ```bash
 cd debate-for-ai-alignment
@@ -170,6 +172,7 @@ kedro jupyter lab
 ```
 
 - `notebooks/ReportAnalysis.ipynb` — generates the charts and statistical analysis shown in the README
+- `notebooks/simple_debate.ipynb` — walkthrough of a single debate interaction
 - `notebooks/scratch_notebook.ipynb` — scratchpad for ad-hoc exploration
 
 ## For Kedro Users
@@ -192,7 +195,7 @@ kedro run                          # Run all pipelines
 kedro run --tags naive             # Run only the naive judge protocol
 kedro run --pipeline preprocessing # Run only data preprocessing
 kedro viz run                      # Launch the pipeline visualization
-kedro test                         # Run tests
+pytest                             # Run tests (requires dev dependencies)
 kedro jupyter lab                  # Open JupyterLab with Kedro context
 ```
 
