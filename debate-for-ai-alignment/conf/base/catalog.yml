@@ -30,22 +30,23 @@ quality_filtered_train_{set_unique_id}:
   filepath: "${_gcp_bucket_root}/data/01_raw/quality_filtered_train_partitioned/{set_unique_id}/unique_set.json"
   credentials: gcp_data_sa
 
-# Output
+# Output — paths include model name so results from different models coexist.
+# Override at runtime: kedro run --params model_name:gpt-5.4-mini
 partitioned_unique_set_{kind}_results:
   type: partitions.PartitionedDataset
-  path: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_results"
+  path: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_${runtime_params:model_name, gpt-4o-mini}_results"
   dataset: json.JSONDataset
   credentials: gcp_data_sa
 
 partitioned_unique_set_{kind}_results@incremental:
   type: partitions.IncrementalDataset
-  path: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_results"
+  path: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_${runtime_params:model_name, gpt-4o-mini}_results"
   dataset: json.JSONDataset
   credentials: gcp_data_sa
 
 unique_set_{kind}_results_{set_unique_id}:
   type: json.JSONDataset
-  filepath: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_results/{set_unique_id}/unique_set.json"
+  filepath: "${_gcp_bucket_root}/data/02_intermediate/unique_set_{kind}_${runtime_params:model_name, gpt-4o-mini}_results/{set_unique_id}/unique_set.json"
   credentials: gcp_data_sa
 
 
