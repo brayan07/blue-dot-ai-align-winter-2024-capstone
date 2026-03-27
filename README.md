@@ -107,5 +107,15 @@ To see concrete examples of the debate protocols, see the [debate transcripts](h
 * Unstructured Debate induces greater model uncertainty than Structured Debate and indeed all other protocols, including Naive. This is a rather puzzling finding considering that in the Naive case, the AI judge is given less information than in the Unstructured Debate case.
 
 ## Running the Experiments in this Repository
-* If you are familiar with [Kedro](https://kedro.org/), you can clone this repository and it should be relatively straightforward from there to run the experiments I conducted.
-* If you are not familiar with [Kedro](https://kedro.org/), I will soon add a quick start guide to help you get started.
+
+See the **[Getting Started Guide](GETTING_STARTED.md)** for step-by-step instructions. No Google Cloud credentials or Kedro knowledge required — a setup script configures everything for local storage.
+
+```bash
+bash scripts/setup_local.sh          # Download data, create local config
+cd debate-for-ai-alignment
+pip install -e '.[dev]'
+kedro run --pipeline preprocessing   # Filter and partition dataset
+kedro run --tags naive               # Run your first experiment
+```
+
+The guide also covers viewing results, running the transcript viewer, and a section for [Kedro-native users](GETTING_STARTED.md#for-kedro-users).
