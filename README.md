@@ -108,12 +108,14 @@ To see concrete examples of the debate protocols, see the [debate transcripts](h
 
 ## Running the Experiments in this Repository
 
-See the **[Getting Started Guide](GETTING_STARTED.md)** for step-by-step instructions on how to:
+See the **[Getting Started Guide](GETTING_STARTED.md)** for step-by-step instructions. No Google Cloud credentials or Kedro knowledge required — a setup script configures everything for local storage.
 
-1. Set up your environment and install dependencies
-2. Configure API keys and data access
-3. Run individual debate protocols or the full experiment suite
-4. View debate transcripts locally or via the [hosted web app](https://quality-data-debate-app.onrender.com/)
-5. Explore the analysis notebooks
+```bash
+bash scripts/setup_local.sh          # Download data, create local config
+cd debate-for-ai-alignment
+pip install -e '.[dev]'
+kedro run --pipeline preprocessing   # Filter and partition dataset
+kedro run --tags naive               # Run your first experiment
+```
 
-No prior knowledge of [Kedro](https://kedro.org/) is required — the guide includes a simple path that works without any Kedro experience, as well as a section for Kedro-native users.
+The guide also covers viewing results, running the transcript viewer, and a section for [Kedro-native users](GETTING_STARTED.md#for-kedro-users).

@@ -1,12 +1,12 @@
 # Getting Started
 
-This guide walks you through setting up the project from scratch so you can run debate experiments and view the results. No prior knowledge of [Kedro](https://kedro.org/) is required.
+This guide walks you through setting up the project from scratch so you can run debate experiments and view the results. **No Google Cloud credentials or Kedro knowledge required** — a setup script configures everything for local storage.
 
 ## Prerequisites
 
 - **Python 3.9+** (3.10 recommended; the Docker image uses 3.10)
 - **An OpenAI API key** with access to `gpt-4o-mini` (used by the debate agents and judge)
-- **Google Cloud credentials** with read access to the project's GCS data bucket (see [Data Access](#data-access) below)
+- **curl** (for downloading the dataset)
 - **Docker & Docker Compose** (optional, only needed to run the debate transcript viewer locally via Docker)
 
 ## Quick Start
@@ -18,98 +18,61 @@ git clone https://github.com/brayan07/blue-dot-ai-align-winter-2024-capstone.git
 cd blue-dot-ai-align-winter-2024-capstone
 ```
 
-### 2. Create a virtual environment and install dependencies
+### 2. Run the setup script
+
+This downloads the [QuALITY dataset](https://github.com/nyu-mll/quality) and creates local configuration files that store data on your filesystem (bypassing the GCS bucket used in the original experiments):
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install the Kedro project (includes all experiment dependencies)
-pip install ./debate-for-ai-alignment
-
-# Install dev dependencies (for running analysis notebooks and tests)
-pip install -r debate-for-ai-alignment/requirements-dev.txt
+bash scripts/setup_local.sh
 ```
 
-### 3. Verify the installation
+### 3. Set your OpenAI API key
 
-Confirm that Kedro can find the project's pipelines:
-
-```bash
-cd debate-for-ai-alignment
-kedro registry list
-```
-
-You should see three pipelines: `__default__`, `debate`, and `preprocessing`. If you see a `ModuleNotFoundError`, the install in step 2 didn't complete successfully.
-
-```bash
-cd ..   # Back to the repository root
-```
-
-### 4. Configure your OpenAI API key
-
-Create a local parameters override (so you don't accidentally commit your key):
-
-```bash
-mkdir -p debate-for-ai-alignment/conf/local
-```
-
-Create `debate-for-ai-alignment/conf/local/parameters.yml`:
+Edit `debate-for-ai-alignment/conf/local/parameters.yml` (created by the setup script) and replace the placeholder with your key:
 
 ```yaml
 llm_config:
   model: gpt-4o-mini
-  api_key: "sk-your-openai-api-key-here"
+  api_key: "sk-..."
 ```
 
-Kedro merges `conf/local/` on top of `conf/base/`, and `conf/local/` is gitignored.
-
-### 5. Set up data access
-
-<a id="data-access"></a>
-
-The experiment data (QuALITY dataset subsets and results) is stored in a Google Cloud Storage bucket. You need GCP credentials to read from it.
-
-The credentials are passed to [`gcsfs.GCSFileSystem`](https://gcsfs.readthedocs.io/) via Kedro's catalog. You have two options:
-
-**Option A: Service account key file (recommended)**
-
-1. Create a GCP service account (or use an existing one) with **Storage Object Viewer** access to the bucket `blue-dot-ai-align-winter-2024-capstone`.
-2. Download the service account key JSON file (e.g., `my-key.json`).
-3. Create `debate-for-ai-alignment/conf/local/credentials.yml`:
+Alternatively, set the `OPENAI_API_KEY` environment variable and use OmegaConf's resolver:
 
 ```yaml
-gcp_data_sa:
-  token: /absolute/path/to/my-key.json
-```
-
-**Option B: Application default credentials**
-
-If you have `gcloud` CLI configured with appropriate permissions:
-
-```bash
-gcloud auth application-default login
-```
-
-Then create `debate-for-ai-alignment/conf/local/credentials.yml`:
-
-```yaml
-gcp_data_sa:
-  token: google_default
+llm_config:
+  model: gpt-4o-mini
+  api_key: "${oc.env:OPENAI_API_KEY}"
 ```
 
 > **Note:** `conf/local/` is gitignored, so your credentials will not be committed.
 
-### 6. Run a single experiment
-
-Each debate protocol is tagged in the Kedro pipeline. To run a single protocol (e.g., the naive judge baseline):
+### 4. Create a virtual environment and install dependencies
 
 ```bash
 cd debate-for-ai-alignment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -e '.[dev]'
+```
+
+### 5. Run the preprocessing pipeline
+
+This filters the QuALITY dataset down to the 146 questions used in the experiments and partitions them by article:
+
+```bash
+kedro run --pipeline preprocessing
+```
+
+### 6. Run a single experiment
+
+Each debate protocol is tagged in the Kedro pipeline. Start with a fast one:
+
+```bash
 kedro run --tags naive
 ```
 
 Available protocol tags:
+
 | Tag | Protocol | Description |
 |-----|----------|-------------|
 | `naive` | Naive Judge | Judge sees only the article title, no body |
@@ -124,16 +87,18 @@ To run all protocols at once:
 kedro run
 ```
 
-> **Warning:** Running all protocols processes 97 question sets across 5 protocols (485 total pipeline nodes). Each node makes multiple OpenAI API calls, so a full run may take several hours and cost significant API credits. Start with a single protocol to verify your setup works.
+> **Cost note:** Running all protocols processes 97 question sets across 5 protocols (~2,300 trials), each making multiple `gpt-4o-mini` API calls. A full run may take several hours and cost significant API credits. Start with a single protocol to verify your setup works.
+
+Results are saved to `data/02_intermediate/unique_set_{protocol}_results/`.
 
 ### 7. View results
 
-#### Option A: Hosted web app (no setup required)
+#### Hosted web app (no setup required)
 
 The debate transcripts from the original experiments are available at:
 **https://quality-data-debate-app.onrender.com/**
 
-#### Option B: Run the transcript viewer locally with Docker
+#### Run the transcript viewer locally with Docker
 
 From the repository root:
 
@@ -143,11 +108,7 @@ docker compose up --build
 
 Then open http://localhost:8050 in your browser.
 
-This builds a container that installs the project, loads results from GCS, and serves a Dash web application where you can browse debate transcripts, compare protocols, and view model confidence scores.
-
-> **Note:** The Docker container also needs GCP credentials. Mount your credentials file or set environment variables as needed. The container looks for credentials at `/etc/secrets/credentials.yml` and `/etc/secrets/parameters.yml` (see `debate-ui/docker/scripts/move_sensitive_files_to_local_conf.sh`).
-
-#### Option C: Run the transcript viewer without Docker
+#### Run the transcript viewer without Docker
 
 ```bash
 # From the repository root, with your .venv activated
@@ -158,16 +119,10 @@ python -m src.app
 
 Then open http://localhost:8050.
 
-> **Note:** The local viewer loads data from GCS via the Kedro catalog, so you still need GCP credentials configured (see [step 5](#data-access)).
-
 ### 8. Explore the analysis notebooks
-
-Three Jupyter notebooks are included for exploring and analyzing results:
 
 ```bash
 cd debate-for-ai-alignment
-
-# Launch JupyterLab with Kedro integration
 kedro jupyter lab
 ```
 
@@ -182,9 +137,8 @@ If you're already familiar with Kedro, here's what you need to know:
 - **Kedro version:** 0.19.10
 - **Project root:** `debate-for-ai-alignment/` (this is the Kedro project directory)
 - **Pipelines:** `preprocessing` (data filtering) and `debate` (all five protocols)
-- **Catalog:** GCS-backed datasets defined in `conf/base/catalog.yml`
+- **Catalog:** `conf/base/catalog.yml` uses GCS paths; `scripts/setup_local.sh` creates a `conf/local/catalog.yml` override for local filesystem storage. If you have GCS credentials, you can skip the setup script and place a `credentials.yml` in `conf/local/` with a `gcp_data_sa` key instead.
 - **Parameters:** `conf/base/parameters.yml` (model config, data paths)
-- **Credentials:** `conf/local/credentials.yml` (GCP service account, gitignored)
 - **Kedro-Viz:** Enabled. Run `kedro viz run` to visualize the pipeline DAG.
 
 Standard Kedro commands work as expected:
@@ -206,13 +160,14 @@ blue-dot-ai-align-winter-2024-capstone/
 ├── README.md                          # Research findings and results
 ├── GETTING_STARTED.md                 # This file
 ├── docker-compose.yml                 # Docker setup for the transcript viewer
+├── scripts/
+│   └── setup_local.sh                 # Local setup (downloads data, no GCS needed)
 ├── debate-for-ai-alignment/           # Kedro project (experiments)
 │   ├── conf/
 │   │   ├── base/
 │   │   │   ├── catalog.yml            # Data catalog (GCS datasets)
 │   │   │   └── parameters.yml         # Model config and parameters
-│   │   └── local/                     # Local overrides (gitignored)
-│   │       └── credentials.yml        # GCP credentials (you create this)
+│   │   └── local/                     # Local overrides (gitignored, created by setup script)
 │   ├── src/debate_for_ai_alignment/
 │   │   ├── pipelines/
 │   │   │   ├── preprocessing/         # QuALITY dataset filtering
@@ -238,16 +193,22 @@ blue-dot-ai-align-winter-2024-capstone/
 
 ## Troubleshooting
 
-**"No credentials found" or GCS access errors**
-- Ensure `debate-for-ai-alignment/conf/local/credentials.yml` exists and contains valid GCP service account credentials.
-- The credential key in the YAML must be `gcp_data_sa` to match the catalog configuration.
+**`kedro run` fails with credential or GCS errors**
+- Make sure you ran `bash scripts/setup_local.sh` first — it creates a local catalog that stores data on your filesystem instead of GCS.
 
 **OpenAI API errors**
-- Check that your API key is set correctly in `conf/base/parameters.yml` (or `conf/local/parameters.yml`).
+- Check that your API key is set correctly in `conf/local/parameters.yml` or via the `OPENAI_API_KEY` environment variable.
 - Ensure your OpenAI account has access to `gpt-4o-mini`.
 
-**Import errors when running the UI**
-- Make sure you installed the Kedro project first (`pip install ./debate-for-ai-alignment`) before installing the UI requirements. The UI depends on the main project package.
+**`ModuleNotFoundError: kedro_viz.integrations.kedro.sqlite_store`**
+- This happens with `kedro-viz>=11.0`. The `requirements.txt` pins `kedro-viz>=6.7.0,<11.0` to avoid this. If you hit it, run `pip install 'kedro-viz>=6.7.0,<11.0'`.
 
-**Docker build fails**
-- The Docker build installs the Kedro project and UI requirements from within the container. Ensure you haven't modified `pyproject.toml` or `requirements.txt` in a way that breaks the install.
+**Import errors when running the UI**
+- Make sure you installed the Kedro project first (`pip install -e ./debate-for-ai-alignment`) before installing the UI requirements. The UI depends on the main project package.
+
+**Missing dataset**
+- If preprocessing fails, verify the dataset was downloaded:
+  ```bash
+  ls debate-for-ai-alignment/data/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped.train
+  ```
+  If not, re-run `bash scripts/setup_local.sh`.
