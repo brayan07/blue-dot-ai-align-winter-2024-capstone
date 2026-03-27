@@ -4,10 +4,10 @@ This guide walks you through setting up the project from scratch so you can run 
 
 ## Prerequisites
 
-- **Python 3.10+** (3.10 recommended; the Docker image uses 3.10)
+- **Python 3.9+** (3.10 recommended; the Docker image uses 3.10)
 - **An OpenAI API key** with access to `gpt-4o-mini` (used by the debate agents and judge)
 - **Google Cloud credentials** with read access to the project's GCS data bucket (see [Data Access](#data-access) below)
-- **Docker & Docker Compose** (optional, only needed to run the debate transcript viewer locally)
+- **Docker & Docker Compose** (optional, only needed to run the debate transcript viewer locally via Docker)
 
 ## Quick Start
 
@@ -31,9 +31,30 @@ pip install ./debate-for-ai-alignment
 pip install -r debate-for-ai-alignment/requirements-dev.txt
 ```
 
-### 3. Configure your OpenAI API key
+### 3. Verify the installation
 
-Edit `debate-for-ai-alignment/conf/base/parameters.yml` and set your API key:
+Confirm that Kedro can find the project's pipelines:
+
+```bash
+cd debate-for-ai-alignment
+kedro registry list
+```
+
+You should see three pipelines: `__default__`, `debate`, and `preprocessing`. If you see a `ModuleNotFoundError`, the install in step 2 didn't complete successfully.
+
+```bash
+cd ..   # Back to the repository root
+```
+
+### 4. Configure your OpenAI API key
+
+Create a local parameters override (so you don't accidentally commit your key):
+
+```bash
+mkdir -p debate-for-ai-alignment/conf/local
+```
+
+Create `debate-for-ai-alignment/conf/local/parameters.yml`:
 
 ```yaml
 llm_config:
@@ -41,39 +62,45 @@ llm_config:
   api_key: "sk-your-openai-api-key-here"
 ```
 
-> **Tip:** To avoid accidentally committing your key, you can instead create a local override at `debate-for-ai-alignment/conf/local/parameters.yml` with the same structure. Kedro merges local config on top of base config, and `conf/local/` is gitignored.
+Kedro merges `conf/local/` on top of `conf/base/`, and `conf/local/` is gitignored.
 
-### 4. Set up data access
+### 5. Set up data access
 
 <a id="data-access"></a>
 
 The experiment data (QuALITY dataset subsets and results) is stored in a Google Cloud Storage bucket. You need GCP credentials to read from it.
 
+The credentials are passed to [`gcsfs.GCSFileSystem`](https://gcsfs.readthedocs.io/) via Kedro's catalog. You have two options:
+
+**Option A: Service account key file (recommended)**
+
 1. Create a GCP service account (or use an existing one) with **Storage Object Viewer** access to the bucket `blue-dot-ai-align-winter-2024-capstone`.
-2. Download the service account key JSON file.
-3. Create a credentials file at `debate-for-ai-alignment/conf/local/credentials.yml`:
+2. Download the service account key JSON file (e.g., `my-key.json`).
+3. Create `debate-for-ai-alignment/conf/local/credentials.yml`:
 
 ```yaml
 gcp_data_sa:
-  type: service_account
-  project_id: your-gcp-project-id
-  private_key_id: "..."
-  private_key: "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-  client_email: "...@...iam.gserviceaccount.com"
-  client_id: "..."
-  auth_uri: "https://accounts.google.com/o/oauth2/auth"
-  token_uri: "https://oauth2.googleapis.com/token"
+  token: /absolute/path/to/my-key.json
 ```
 
-Alternatively, if you have `gcloud` CLI configured with appropriate permissions, you may be able to use application default credentials by setting:
+**Option B: Application default credentials**
+
+If you have `gcloud` CLI configured with appropriate permissions:
 
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/service-account-key.json
+gcloud auth application-default login
+```
+
+Then create `debate-for-ai-alignment/conf/local/credentials.yml`:
+
+```yaml
+gcp_data_sa:
+  token: google_default
 ```
 
 > **Note:** `conf/local/` is gitignored, so your credentials will not be committed.
 
-### 5. Run a single experiment
+### 6. Run a single experiment
 
 Each debate protocol is tagged in the Kedro pipeline. To run a single protocol (e.g., the naive judge baseline):
 
@@ -97,9 +124,9 @@ To run all protocols at once:
 kedro run
 ```
 
-> **Warning:** Running all protocols processes 146 questions across 5 protocols with multiple variations each (2,336 total trials). This will make many OpenAI API calls and may take several hours. Start with a single protocol to verify your setup works.
+> **Warning:** Running all protocols processes 97 question sets across 5 protocols (485 total pipeline nodes). Each node makes multiple OpenAI API calls, so a full run may take several hours and cost significant API credits. Start with a single protocol to verify your setup works.
 
-### 6. View results
+### 7. View results
 
 #### Option A: Hosted web app (no setup required)
 
@@ -131,7 +158,7 @@ python -m src.app
 
 Then open http://localhost:8050.
 
-### 7. Explore the analysis notebooks
+### 8. Explore the analysis notebooks
 
 Two Jupyter notebooks are included for exploring and analyzing results:
 
