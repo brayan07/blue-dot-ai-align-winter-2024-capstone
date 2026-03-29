@@ -1,10 +1,20 @@
-from typing import Literal, List
+import inspect
+from typing import Any, Literal, List
 
+import autogen_agentchat.messages as agentchat_messages
 from autogen_agentchat.base import TaskResult
+from autogen_agentchat.messages import BaseMessage
 from autogen_core.models import TopLogprob
-from pydantic import BaseModel, root_validator, model_validator, Field
+from pydantic import BaseModel, root_validator, model_validator, field_validator, Field
 
 from debate_for_ai_alignment.pipelines.preprocessing.models import UniqueSet
+
+# Build a mapping of type name -> concrete message class for deserialization.
+_MESSAGE_TYPE_MAP = {
+    name: cls
+    for name, cls in inspect.getmembers(agentchat_messages, inspect.isclass)
+    if issubclass(cls, BaseMessage) and not inspect.isabstract(cls)
+}
 
 
 class DebateResult(BaseModel):
@@ -26,6 +36,27 @@ class MultipleRoundDebateResult(DebateResult):
     is_correct_option_first: bool
     n_rounds: int
     task_result: TaskResult
+
+    @field_validator("task_result", mode="before")
+    @classmethod
+    def deserialize_task_result(cls, v: Any) -> Any:
+        """Handle deserialization of TaskResult from dict.
+
+        Pydantic cannot deserialize the abstract BaseAgentEvent/BaseChatMessage
+        union directly. This validator maps each message dict to its concrete
+        type using the 'type' discriminator field before passing to TaskResult.
+        """
+        if isinstance(v, dict) and "messages" in v:
+            messages = []
+            for msg in v["messages"]:
+                if isinstance(msg, dict) and "type" in msg:
+                    msg_cls = _MESSAGE_TYPE_MAP.get(msg["type"])
+                    if msg_cls is not None:
+                        messages.append(msg_cls.model_validate(msg))
+                        continue
+                messages.append(msg)
+            v = {**v, "messages": messages}
+        return v
 
     @model_validator(mode="after")
     def check_lengths(self):
