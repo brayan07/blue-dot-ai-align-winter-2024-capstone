@@ -2,6 +2,10 @@
 # TODO: Download directly from Github
 raw_quality_train_path: "data/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped.train"
 
+# Model name used for result path routing in the catalog.
+# Override at runtime: kedro run --params model_name:gpt-5.4-mini,llm_config.model:gpt-5.4-mini
+model_name: gpt-4o-mini
+
 # Configuration for the OpenAI API
 # TODO: Set this up as a credential.
 llm_config:
